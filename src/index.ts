@@ -6,8 +6,14 @@ dotenv.config();
 
 const token = process.env.DISCORD_TOKEN;
 
+// Extend Client to include custom properties like commands
+// TODO: Improve this.
+class MyClient extends Client {
+	commands: Collection<string, { data: { name: string }; execute: Function }> = new Collection();
+}
+
 // Create a new client instance
-const client = new Client({ intents: [GatewayIntentBits.Guilds] });
+const client = new MyClient({ intents: [GatewayIntentBits.Guilds] });
 
 // Load all valid commands, and store them in the client.
 client.commands = new Collection();
@@ -27,7 +33,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 	// Only handling slash commands, there are other interactions the bot can receive.
 	if (!interaction.isChatInputCommand()) return;
 
-	const command = interaction.client.commands.get(interaction.commandName);
+	const command = (interaction.client as MyClient).commands.get(interaction.commandName);
 
 	if (!command) {
 		console.error(`No command matching ${interaction.commandName} was found.`);
@@ -41,7 +47,7 @@ client.on(Events.InteractionCreate, async (interaction) => {
 		if (interaction.replied || interaction.deferred) {
 			await interaction.followUp({
 				content: "There was an error while executing this command!",
-				ephemeral: true, // wtf?
+				ephemeral: true, // Means message is only visible to user who initiated the interaction.
 			});
 		} else {
 			await interaction.reply({
