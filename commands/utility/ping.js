@@ -1,6 +1,6 @@
-const { SlashCommandBuilder } = require("discord.js");
+import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
 
-module.exports = {
+export default {
 	// Name your command, and describe it.
 	data: new SlashCommandBuilder().setName("ping").setDescription("Replies with Pong!"),
 
