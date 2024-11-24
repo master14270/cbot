@@ -1,14 +1,14 @@
-import { SlashCommandBuilder, ChatInputCommandInteraction } from "discord.js";
+import { ChatInputCommandInteraction, Interaction, SlashCommandBuilder } from "discord.js";
 
 export default {
 	data: new SlashCommandBuilder()
 		.setName("user")
 		.setDescription("Provides information about the user."),
-	execute: async function (interaction) {
+	execute: async function (interaction: ChatInputCommandInteraction) {
 		// interaction.user is the object representing the User who ran the command
 		// interaction.member is the GuildMember object, which represents the user in the specific guild
 		await interaction.reply(
-			`This command was run by ${interaction.user.username}, who joined on ${interaction.member.joinedAt}.`
+			`This command was run by ${interaction.user.username}, who joined on ${interaction.guild.joinedAt}.`
 		);
 	},
 };

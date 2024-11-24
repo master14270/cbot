@@ -1,6 +1,7 @@
 // Require the necessary discord.js classes
 import { Client, Collection, Events, GatewayIntentBits } from "discord.js";
 import { getAllValidCommands } from "./helpers.js";
+import { Command } from "./types.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -9,7 +10,7 @@ const token = process.env.DISCORD_TOKEN;
 // Extend Client to include custom properties like commands
 // TODO: Improve this.
 class MyClient extends Client {
-	commands: Collection<string, { data: { name: string }; execute: Function }> = new Collection();
+	commands: Collection<string, Command> = new Collection();
 }
 
 // Create a new client instance

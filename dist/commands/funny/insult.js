@@ -2,9 +2,6 @@ import { SlashCommandBuilder } from "discord.js";
 export default {
     // Name your command, and describe it.
     data: new SlashCommandBuilder().setName("insult").setDescription("Generates an insult."),
-    /**
-     * @param {ChatInputCommandInteraction} interaction
-     */
     execute: async function (interaction) {
         // Reach out to the insult api.
         const insultUrl = "https://evilinsult.com/generate_insult.php?lang=en&type=json";
