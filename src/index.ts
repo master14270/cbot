@@ -1,7 +1,7 @@
 // Require the necessary discord.js classes
-import { Client, Collection, Events, GatewayIntentBits } from "discord.js";
-import { getAllValidCommands } from "./helpers.js";
-import { Command } from "./types.js";
+import { Collection, GatewayIntentBits } from "discord.js";
+import { getAllValidCommands, getAllValidEvents } from "./helpers.js";
+import { MyClient } from "./types.js";
 import dotenv from "dotenv";
 dotenv.config();
 
@@ -9,9 +9,6 @@ const token = process.env.DISCORD_TOKEN;
 
 // Extend Client to include custom properties like commands
 // TODO: Improve this.
-class MyClient extends Client {
-	commands: Collection<string, Command> = new Collection();
-}
 
 // Create a new client instance
 const client = new MyClient({ intents: [GatewayIntentBits.Guilds] });
@@ -23,41 +20,18 @@ for (const command of validCommands) {
 	client.commands.set(command.data.name, command);
 }
 
-// When the client is ready, run this code (only once).
-// The distinction between `client: Client<boolean>` and `readyClient: Client<true>` is important for TypeScript developers.
-// It makes some properties non-nullable.
-client.once(Events.ClientReady, (readyClient) => {
-	console.log(`Ready! Logged in as ${readyClient.user.tag}`);
-});
+// Create cooldowns.
+client.cooldowns = new Collection();
 
-client.on(Events.InteractionCreate, async (interaction) => {
-	// Only handling slash commands, there are other interactions the bot can receive.
-	if (!interaction.isChatInputCommand()) return;
-
-	const command = (interaction.client as MyClient).commands.get(interaction.commandName);
-
-	if (!command) {
-		console.error(`No command matching ${interaction.commandName} was found.`);
-		return;
+// Load all valid events, apply them to the client.
+const validEvents = await getAllValidEvents();
+for (const event of validEvents) {
+	if (event.once) {
+		client.once(event.name, (...args) => event.execute(...args));
+	} else {
+		client.on(event.name, (...args) => event.execute(...args));
 	}
+}
 
-	try {
-		await command.execute(interaction);
-	} catch (error) {
-		console.error(error);
-		if (interaction.replied || interaction.deferred) {
-			await interaction.followUp({
-				content: "There was an error while executing this command!",
-				ephemeral: true, // Means message is only visible to user who initiated the interaction.
-			});
-		} else {
-			await interaction.reply({
-				content: "There was an error while executing this command!",
-				ephemeral: true,
-			});
-		}
-	}
-});
-
-// Log in to Discord with your client's token
+// Log in to Discord with your client's token.
 client.login(token);

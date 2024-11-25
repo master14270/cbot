@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
-import { Command } from "./types";
+import { Command, Event } from "./types";
 
 // Get the current directory of the script
 const __dirname = import.meta.dirname;
@@ -34,4 +34,22 @@ export async function getAllValidCommands() {
 	}
 
 	return validCommands;
+}
+
+export async function getAllValidEvents() {
+	const eventsPath = path.join(__dirname, "events");
+	const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
+	const validEvents = [] as Array<Event>;
+
+	for (const file of eventFiles) {
+		const filePath = path.join(eventsPath, file);
+
+		// Convert file path to a file:// URL
+		const urlPath = pathToFileURL(filePath).href;
+		const rawImport = await import(urlPath);
+		const event = rawImport.default as Event;
+		validEvents.push(event);
+	}
+
+	return validEvents;
 }

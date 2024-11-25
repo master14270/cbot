@@ -27,4 +27,18 @@ export async function getAllValidCommands() {
     }
     return validCommands;
 }
+export async function getAllValidEvents() {
+    const eventsPath = path.join(__dirname, "events");
+    const eventFiles = fs.readdirSync(eventsPath).filter((file) => file.endsWith(".js"));
+    const validEvents = [];
+    for (const file of eventFiles) {
+        const filePath = path.join(eventsPath, file);
+        // Convert file path to a file:// URL
+        const urlPath = pathToFileURL(filePath).href;
+        const rawImport = await import(urlPath);
+        const event = rawImport.default;
+        validEvents.push(event);
+    }
+    return validEvents;
+}
 //# sourceMappingURL=helpers.js.map
