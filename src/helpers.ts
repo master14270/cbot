@@ -82,6 +82,7 @@ export function handleCommandCooldowns(interaction: ChatInputCommandInteraction)
 		if (now < expirationTime) {
 			const expiredTimestamp = Math.round(expirationTime / 1_000);
 
+			// Is there a cleaner way to do this?
 			interaction
 				.reply({
 					content: `Please wait, you are on a cooldown for \`${command.data.name}\`. You can use it again <t:${expiredTimestamp}:R>.`,
