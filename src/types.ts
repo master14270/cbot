@@ -1,7 +1,7 @@
 import { ChatInputCommandInteraction, SlashCommandBuilder, Client, Collection } from "discord.js";
 
 // Types vs. Classes?
-export type HandleInteractionFunction = (interaction: ChatInputCommandInteraction) => void;
+export type HandleInteractionFunction = (interaction: ChatInputCommandInteraction) => Promise<void>;
 
 export type Command = {
 	cooldown: number | undefined; // Cooldown in seconds.
